@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.15)
 
 project(rknn_model_zoo_utils)
 
+# ===================================================
+# 关键修复: 禁用 RGA 和 LibJPEG 依赖
+# 这会告诉 image_utils.c 不要引用 im2d.h，也不要用 rga 函数
+# ===================================================
+add_definitions(-DDISABLE_RGA)
+add_definitions(-DDISABLE_LIBJPEG)
+
+# ===================================================
+# 1. fileutils 静态库（文件读写）
+# ===================================================
 add_library(fileutils STATIC
     file_utils.c
 )
@@ -9,6 +19,9 @@ target_include_directories(fileutils PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# ===================================================
+# 2. imagedrawing 静态库（图像绘制）
+# ===================================================
 add_library(imagedrawing STATIC
     image_drawing.c
 )
@@ -16,49 +29,19 @@ target_include_directories(imagedrawing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-if(DISABLE_RGA AND NOT (TARGET_SOC STREQUAL "rv1106" OR TARGET_SOC STREQUAL "rv1103" OR TARGET_SOC STREQUAL "rv1103b"))
-    add_definitions(-DDISABLE_RGA)
-endif ()
-
-# only RGA on rv1106 and rk3588 support handle
-if (TARGET_SOC STREQUAL "rv1106" OR TARGET_SOC STREQUAL "rk3588")
-    add_definitions(-DLIBRGA_IM2D_HANDLE)
-endif()
-
+# ===================================================
+# 3. imageutils 静态库（图像处理 - 使用 CPU）
+# ===================================================
 add_library(imageutils STATIC
     image_utils.c
 )
-
 target_include_directories(imageutils PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${STB_INCLUDES}
-    ${LIBRGA_INCLUDES}
 )
 
-target_link_libraries(imageutils
-    ${LIBRGA}
-)
+# 注意：由于禁用了 RGA 和 LibJPEG，imageutils 不需要链接任何外部库
+# 图像处理将使用 CPU 实现（convert_image_cpu）
 
-if (DISABLE_LIBJPEG)
-    add_definitions(-DDISABLE_LIBJPEG)
-else()
-    target_link_libraries(imageutils
-        ${LIBJPEG}
-    )
-    target_include_directories(imageutils PUBLIC
-        ${LIBJPEG_INCLUDES}
-    )
-endif()
-
-add_library(audioutils STATIC
-    audio_utils.c
-)
-
-target_link_libraries(audioutils
-    ${LIBSNDFILE}
-)
-
-target_include_directories(audioutils PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${LIBSNDFILE_INCLUDES}
-)
+# ===================================================
+# 注意：audioutils 库已移除（audio_utils.c 不存在，且项目未使用）
+# ===================================================

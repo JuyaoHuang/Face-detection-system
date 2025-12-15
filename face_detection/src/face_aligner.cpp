@@ -49,7 +49,12 @@ int align_face(image_buffer_t *src_img, point_t landmarks[5], image_buffer_t *al
     }
 
     // 4. 计算仿射变换矩阵（相似变换：旋转 + 缩放 + 平移）
-    Mat transform_matrix = estimateAffinePartial2D(src_points, dst_points);
+    // 使用 getAffineTransform (更兼容，需要3个点)
+    // 使用：左眼、右眼、鼻尖（前3个关键点）
+    std::vector<Point2f> src_3pts = {src_points[0], src_points[1], src_points[2]};
+    std::vector<Point2f> dst_3pts = {dst_points[0], dst_points[1], dst_points[2]};
+
+    Mat transform_matrix = getAffineTransform(src_3pts, dst_3pts);
 
     if (transform_matrix.empty()) {
         printf("[face_aligner] Error: Failed to compute affine transform matrix\n");

@@ -4,8 +4,10 @@
 #include <math.h>
 #include <sys/time.h>
 
+#ifndef DISABLE_RGA
 #include "im2d.h"
 #include "drmrga.h"
+#endif
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_THREAD_LOCALS
@@ -458,6 +460,7 @@ static int convert_image_cpu(image_buffer_t *src, image_buffer_t *dst, image_rec
     return 0;
 }
 
+#ifndef DISABLE_RGA
 static int get_rga_fmt(image_format_t fmt) {
     switch (fmt)
     {
@@ -473,6 +476,7 @@ static int get_rga_fmt(image_format_t fmt) {
         return -1;
     }
 }
+#endif // DISABLE_RGA
 
 int get_image_size(image_buffer_t* image)
 {
@@ -495,6 +499,7 @@ int get_image_size(image_buffer_t* image)
     }
 }
 
+#ifndef DISABLE_RGA
 static int convert_image_rga(image_buffer_t* src_img, image_buffer_t* dst_img, image_rect_t* src_box, image_rect_t* dst_box, char color)
 {
     int ret = 0;
@@ -669,6 +674,7 @@ err:
     // printf("finish\n");
     return ret;
 }
+#endif // DISABLE_RGA
 
 int convert_image(image_buffer_t* src_img, image_buffer_t* dst_img, image_rect_t* src_box, image_rect_t* dst_box, char color)
 {

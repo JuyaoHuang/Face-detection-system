@@ -1,0 +1,2 @@
+/home/topeet/gcc/bin/aarch64-linux-gnu-ar qc libimagedrawing.a  CMakeFiles/imagedrawing.dir/image_drawing.c.o
+/home/topeet/gcc/bin/aarch64-linux-gnu-ranlib libimagedrawing.a

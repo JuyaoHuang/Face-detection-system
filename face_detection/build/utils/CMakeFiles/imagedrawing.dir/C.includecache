@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/topeet/project/face_detection/utils/common.h
+
+/home/topeet/project/face_detection/utils/font.h
+
+/home/topeet/project/face_detection/utils/image_drawing.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+ctype.h
+-
+image_drawing.h
+/home/topeet/project/face_detection/utils/image_drawing.h
+font.h
+/home/topeet/project/face_detection/utils/font.h
+
+/home/topeet/project/face_detection/utils/image_drawing.h
+common.h
+/home/topeet/project/face_detection/utils/common.h
+

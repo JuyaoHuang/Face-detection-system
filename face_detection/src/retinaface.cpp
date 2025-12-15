@@ -4,15 +4,25 @@
 #include <math.h>
 
 #include "face_utils.h"  // 使用我们自己的头文件
-// 以下头文件从 examples 引用
+
+// ========================================
+// 宏重命名技巧：解决 image_buffer_t 类型冲突
+// ========================================
+// face_utils.h 已定义了 image_buffer_t
+// common.h 也定义了 image_buffer_t，会导致冲突
+// 解决方法：在包含 common.h 之前，用宏将其重命名
+
+#define image_buffer_t image_buffer_utils_t
+#define image_rect_t image_rect_utils_t
 #include "common.h"
 #include "file_utils.h"
 #include "image_utils.h"
-#include "rknn_box_priors.h"  // 这个文件需要从 examples/RetinaFace/cpp/ 复制到 include/
+#undef image_buffer_t
+#undef image_rect_t
 
-#define NMS_THRESHOLD 0.4
-#define CONF_THRESHOLD 0.5
-#define VIS_THRESHOLD 0.4
+#include "rknn_box_priors.h"
+
+// 注意：NMS_THRESHOLD, CONF_THRESHOLD, VIS_THRESHOLD 已在 face_utils.h 中定义
 
 static int clamp(int x, int min, int max) {
     if (x > max) return max;
@@ -303,15 +313,27 @@ int release_retinaface_model(rknn_app_context_t *app_ctx) {
 
 int inference_retinaface_model(rknn_app_context_t *app_ctx, image_buffer_t *src_img, retinaface_result_t *out_result) {
     int ret;
-    image_buffer_t img;
+    image_buffer_utils_t img;  // 使用 utils 版本的 image_buffer_t
+    image_buffer_utils_t src_img_utils;  // 转换后的 src_img
     letterbox_t letter_box;
     rknn_input inputs[1];
     rknn_output outputs[app_ctx->io_num.n_output];
-    memset(&img, 0, sizeof(image_buffer_t));
+    memset(&img, 0, sizeof(image_buffer_utils_t));
+    memset(&src_img_utils, 0, sizeof(image_buffer_utils_t));
     memset(inputs, 0, sizeof(inputs));
     memset(outputs, 0, sizeof(rknn_output) * 3);
     memset(&letter_box, 0, sizeof(letterbox_t));
     int bg_color = 114;//letterbox background pixel
+
+    // 转换 src_img（face_utils.h 版本）到 src_img_utils（common.h 版本）
+    src_img_utils.width = src_img->width;
+    src_img_utils.height = src_img->height;
+    src_img_utils.width_stride = src_img->width;
+    src_img_utils.height_stride = src_img->height;
+    src_img_utils.format = IMAGE_FORMAT_RGB888;  // 假设输入是 RGB
+    src_img_utils.virt_addr = src_img->virt_addr;
+    src_img_utils.size = src_img->size;
+    src_img_utils.fd = -1;
 
     // Pre Process
     img.width = app_ctx->model_width;
@@ -325,7 +347,7 @@ int inference_retinaface_model(rknn_app_context_t *app_ctx, image_buffer_t *src_
         return -1;
     }
 
-    ret = convert_image_with_letterbox(src_img, &img, &letter_box, bg_color);
+    ret = convert_image_with_letterbox(&src_img_utils, &img, &letter_box, bg_color);
     if (ret < 0) {
         printf("convert_image fail! ret=%d\n", ret);
         return -1;
