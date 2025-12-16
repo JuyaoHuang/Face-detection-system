@@ -1,6 +1,0 @@
-.idea
-*.__pycache__/
-datasets/
-logs/
-work_space/
-*.pyc

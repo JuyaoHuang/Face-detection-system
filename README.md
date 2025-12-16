@@ -1,3 +1,8 @@
+# SmartGate-App (智能门禁系统工程端)
+
+本项目是基于 RK3568 的人脸识别门禁系统应用端，包含后端 (FastAPI)、前端及 C++ 推理引擎。
+
+
 ## What's it
 
 目标：实现双模验证的智能门禁（人脸识别 + 传统密码）
@@ -32,6 +37,12 @@
 4. 触发机制
 
    低功耗混合模式：移动侦测（待机）+ 按键唤醒 + 人脸识别（激活）
+
+## 🧠 模型训练
+
+本项目的模型训练源码、数据集处理及 ONNX 导出脚本位于独立的算法仓库，请点击下方链接查看：
+
+👉 **[SmartGate-Model-Zoo (模型训练仓库)](https://github.com/JuyaoHuang/SmartGaze-model-zoo)**
 
 ## Tech Stack
 
