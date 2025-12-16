@@ -27,22 +27,21 @@
 ### 核心文档
 | 文档 | 描述 |
 |------|------|
-| [face_detected.md](./face_detected.md) | **⭐️ 项目总览**（架构、部署、使用、后端集成） |
+| [face_detected.md](./docs/face_detected.md) | **⭐️ 项目总览**（架构、部署、使用、后端集成） |
 
 ### 详细技术文档
 | 文档 | 内容 |
 |------|------|
-| [workflow.md](./docs/new_docs/workflow.md) | 编译运行步骤（VMWare 环境、依赖配置） |
-| [dataflow.md](./docs/new_docs/dataflow.md) | 数据流详解（JPEG → 512维向量） |
-| [format_out_in.md](./docs/new_docs/format_out_in.md) | API 接口规范（C/Python 接口） |
-| [model_function.md](./docs/new_docs/model_function.md) | 模型功能和作用（RetinaFace + MobileFaceNet） |
-| [img_preprocess.md](./docs/new_docs/img_preprocess.md) | 图片预处理流程 |
-| [middle_function.md](./docs/new_docs/middle_function.md) | 人脸对齐算法（胶水代码） |
+| [workflow.md](./docs/workflow.md) | 编译运行步骤（VMWare 环境、依赖配置） |
+| [dataflow.md](./docs/dataflow.md) | 数据流详解（JPEG → 512维向量） |
+| [format_out_in.md](./docs/format_out_in.md) | API 接口规范（C/Python 接口） |
+| [model_function.md](./docs/model_function.md) | 模型功能和作用（RetinaFace + MobileFaceNet） |
+| [img_preprocess.md](./docs/img_preprocess.md) | 图片预处理流程 |
+| [middle_function.md](./docs/middle_function.md) | 人脸对齐算法（胶水代码） |
 
 ### 其他文档
-- [CMAKE_ARCHITECTURE.md](./CMAKE_ARCHITECTURE.md) - CMake 架构说明
+- [CMAKE_ARCHITECTURE.md](./docs/CMAKE_ARCHITECTURE.md) - CMake 架构说明
 - [error_log.md](./error_log.md) - 错误日志和解决方案
-- [人脸检测待办事项.md](./人脸检测待办事项.md) - 开发任务清单
 
 ---
 
@@ -68,7 +67,7 @@ face_detection/
 │   └── rknn/                 # RKNN 运行时库
 ├── build/
 │   └── libface_engine.so     # 编译产物（动态库）
-├── docs/new_docs/            # 详细技术文档
+├── docs/                      # 详细技术文档
 └── CMakeLists.txt            # 编译配置
 ```
 
@@ -100,7 +99,7 @@ scp build/libface_engine.so root@192.168.1.100:/userdata/face_app/
 scp models/*.rknn root@192.168.1.100:/userdata/face_app/models/
 ```
 
-📖 **详细步骤**: 参考 [workflow.md](./docs/new_docs/workflow.md)
+📖 **详细步骤**: 参考 [workflow.md](./docs/workflow.md)
 
 ---
 
@@ -162,7 +161,7 @@ float similarity = FaceEngine_CosineSimilarity(feature1, feature2);
 FaceEngine_Destroy(engine);
 ```
 
-📖 **详细接口**: 参考 [format_out_in.md](./docs/new_docs/format_out_in.md)
+📖 **详细接口**: 参考 [format_out_in.md](./docs/format_out_in.md)
 
 ---
 
@@ -186,7 +185,7 @@ FaceEngine_Destroy(engine);
 | RetinaFace | 640×640 RGB | 人脸框 + 5关键点 | 95%+ (WIDER FACE) |
 | MobileFaceNet | 112×112 RGB | 512维特征向量 | 99.5%+ (LFW) |
 
-📖 **详细说明**: 参考 [model_function.md](./docs/new_docs/model_function.md)
+📖 **详细说明**: 参考 [model_function.md](./docs/model_function.md)
 
 ---
 
@@ -230,7 +229,7 @@ JPEG 图片 (任意尺寸)
 [6. 余弦相似度] → 匹配结果 (0~1)
 ```
 
-📖 **详细数据流**: 参考 [dataflow.md](./docs/new_docs/dataflow.md)
+📖 **详细数据流**: 参考 [dataflow.md](./docs/dataflow.md)
 
 ---
 
@@ -244,7 +243,7 @@ A: 确保 `third_party/opencv/lib/cmake/opencv4/OpenCVConfig.cmake` 存在。
 
 **Q: 编译时报错 "aarch64-linux-gnu-g++ not found"？**
 
-A: 检查交叉编译工具链路径，参考 [workflow.md](./docs/new_docs/workflow.md)。
+A: 检查交叉编译工具链路径，参考 [workflow.md](./docs/workflow.md)。
 
 ### 运行相关
 
@@ -377,7 +376,7 @@ async def recognize_face(file: UploadFile):
 - ✅ **强制链接**: 使用 `--whole-archive` 确保静态库符号完整
 - ✅ **模块化**: utils 子项目独立构建
 
-📖 **CMake 详解**: 参考 [CMAKE_ARCHITECTURE.md](./CMAKE_ARCHITECTURE.md)
+📖 **CMake 详解**: 参考 [CMAKE_ARCHITECTURE.md](./docs/CMAKE_ARCHITECTURE.md)
 
 ---
 
