@@ -3,9 +3,13 @@ import threading
 import time
 
 import cv2
+from pyexpat import features
 
+from backend.core import doorController
 from backend.core.camera import get_camera
 from backend.core.face_engine import get_face_engine
+from backend.database import manager
+from backend.database.manager import db_manager
 
 '''
     后台线程，用于持续读取摄像头帧处理日常任务
@@ -27,6 +31,8 @@ class BackgroundThread(threading.Thread):
         self.motion_threshold = motion_threshold
         self.similarity_threshold = similarity_threshold
         self.running = False  # 线程运行状态标志
+        self.db_manager = manager.DatabaseManager()
+        self.door_lock = doorController.get_door_controller()
 
     def start(self):
         """启动线程"""
@@ -56,6 +62,7 @@ class BackgroundThread(threading.Thread):
                 time.sleep(self.check_interval)
                 continue
 
+            # 移动监测
             if camera.detect_motion(prev_frame, frame, self.motion_threshold):
                 logging.info("Move!")
                 prev_frame = frame
@@ -71,6 +78,18 @@ class BackgroundThread(threading.Thread):
                 else:
                     logging.info("未识别到人脸")
 
-                # TODO: 与数据库中的特征向量进行比较，判断是否为已知人脸
-                # 若为已知人脸相似度大于0.5，记录日志并且开锁
-                logging.info("开锁")
+                # 与数据库中的特征向量进行比较，判断是否为已知人脸
+                # 从数据库中获取所有人脸特征
+                db_results = db_manager.get_face_features()
+
+                # 遍历数据库中的每个人脸特征，计算相似度
+                for item in db_results:
+                    sim = face_engine.compute_similarity(results, item['feature_vector'])
+                    # 若为已知人脸相似度大于0.5，记录日志并且开锁
+                    if sim > self.similarity_threshold:
+                        logging.info(f"识别到 {item['name']}, 相似度: {sim:.4f}")
+                        self.door_lock.open()
+                        logging.info("开锁")
+                        break
+
+            time.sleep(self.check_interval)
