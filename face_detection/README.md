@@ -172,11 +172,11 @@ FaceEngine_Destroy(engine);
 | 阶段 | 耗时 | 说明 |
 |------|------|------|
 | 图像解码 + 预处理 | ~20ms | OpenCV imdecode + resize |
-| RetinaFace 推理 | ~60ms | NPU 加速 |
+| RetinaFace 推理 | ~40ms | NPU 加速 |
 | 人脸对齐 | ~5ms | 仿射变换 (CPU) |
-| MobileFaceNet 推理 | ~40ms | NPU 加速 |
+| MobileFaceNet 推理 | ~30ms | NPU 加速 |
 | 特征比对 | < 1ms | 余弦相似度计算 |
-| **总计** | **~125ms** | 单张人脸识别 |
+| **总计** | **~96ms** | 单张人脸识别 |
 
 ### 模型规格
 
