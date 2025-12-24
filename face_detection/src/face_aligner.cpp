@@ -76,7 +76,7 @@ int align_face(image_buffer_t *src_img, point_t landmarks[5], image_buffer_t *al
     cvtColor(aligned_face_rgb, debug_aligned_bgr, COLOR_RGB2BGR);
     imwrite("debug_aligned_face_112x112.jpg", debug_aligned_bgr);
     printf("[face_aligner] DEBUG: Saved aligned face to debug_aligned_face_112x112.jpg\n");
-
+ 
     // 7. 分配输出缓冲区
     int output_size = MOBILEFACENET_INPUT_SIZE * MOBILEFACENET_INPUT_SIZE * 3;
     aligned_face->width = MOBILEFACENET_INPUT_SIZE;

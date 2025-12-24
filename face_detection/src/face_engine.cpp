@@ -144,7 +144,7 @@ int face_engine_extract_feature(face_engine_t *engine, unsigned char *jpeg_data,
         printf("(%d,%d) ", face_obj->landmarks[i].x, face_obj->landmarks[i].y);
     }
     printf("\n");
-
+    
     // ========================================
     // 3. 人脸对齐
     // ========================================
@@ -162,10 +162,66 @@ int face_engine_extract_feature(face_engine_t *engine, unsigned char *jpeg_data,
     // ========================================
     // 4. MobileFaceNet 特征提取
     // ========================================
+    // 【终极调试】把准备送给 NPU 的数据，反向保存成图片
+    // 注意：因为我们认为它是 RGB，但 OpenCV 保存图片需要 BGR，所以我们这里转一下以便人类观看
+    // cv::Mat debug_final(112, 112, CV_8UC3, aligned_face.virt_addr);
+    // cv::Mat debug_show;
+    // cv::cvtColor(debug_final, debug_show, cv::COLOR_RGB2BGR); // 转回 BGR 以便保存查看
+    // cv::imwrite("debug_final_input_to_npu.jpg", debug_show);
+    
+    // printf("[DEBUG] Saved NPU input to debug_final_input_to_npu.jpg\n");
+
+    // ========================================
+    // 【强制RGB格式】确保送入MobileFaceNet的绝对是RGB
+    // ========================================
+    printf("[face_engine] DEBUG: Checking aligned_face format before NPU inference\n");
+    printf("[face_engine] DEBUG: aligned_face.format = %d (0=RGB, 1=BGR)\n", aligned_face.format);
+
+    image_buffer_t rgb_input;
+    memset(&rgb_input, 0, sizeof(rgb_input));
+    rgb_input.width = aligned_face.width;
+    rgb_input.height = aligned_face.height;
+    rgb_input.channel = aligned_face.channel;
+    rgb_input.size = aligned_face.size;
+    rgb_input.format = 0;  // RGB
+
+    // 分配新内存
+    rgb_input.virt_addr = (uint8_t*)malloc(aligned_face.size);
+    if (!rgb_input.virt_addr) {
+        printf("[face_engine] Error: Failed to allocate memory for RGB conversion\n");
+        free(aligned_face.virt_addr);
+        return -2;
+    }
+
+    // 根据format决定是否需要转换
+    if (aligned_face.format == 1) {
+        // BGR -> RGB
+        printf("[face_engine] INFO: Converting BGR to RGB\n");
+        Mat bgr_mat(aligned_face.height, aligned_face.width, CV_8UC3, aligned_face.virt_addr);
+        Mat rgb_mat;
+        cvtColor(bgr_mat, rgb_mat, COLOR_BGR2RGB);
+        memcpy(rgb_input.virt_addr, rgb_mat.data, aligned_face.size);
+    } else {
+        // 已经是RGB，直接拷贝
+        printf("[face_engine] INFO: Format is already RGB, copying data\n");
+        memcpy(rgb_input.virt_addr, aligned_face.virt_addr, aligned_face.size);
+    }
+
+    printf("[face_engine] DEBUG: RGB input pixels (first 10): ");
+    for (int i = 0; i < 10; i++) {
+        printf("%d ", rgb_input.virt_addr[i]);
+    }
+    printf("\n");
+
     mobilefacenet_result_t feature_result;
     memset(&feature_result, 0, sizeof(feature_result));
 
-    ret = inference_mobilefacenet_model(&engine->mobilefacenet_ctx, &aligned_face, &feature_result);
+    ret = inference_mobilefacenet_model(&engine->mobilefacenet_ctx, &rgb_input, &feature_result);
+
+    // 释放RGB输入缓冲区
+    if (rgb_input.virt_addr) {
+        free(rgb_input.virt_addr);
+    }
 
     // 释放对齐后的图像内存
     if (aligned_face.virt_addr) {

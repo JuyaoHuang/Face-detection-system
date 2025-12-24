@@ -118,6 +118,8 @@ int inference_mobilefacenet_model(rknn_app_context_t *app_ctx, image_buffer_t *a
     }
 
     int ret;
+
+    // 【调试代码】
     uint8_t* pixel_data = (uint8_t*)aligned_face->virt_addr;
     printf("[mobilefacenet] DEBUG：Input pixels: %d %d %d %d %d ...\n", 
     pixel_data[0], pixel_data[1], pixel_data[2], pixel_data[100], pixel_data[101]);
