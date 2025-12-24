@@ -1,0 +1,125 @@
+======================================================================
+           Face Similarity Test Report
+======================================================================
+Test Time: 2025-12-24 18:19:55
+Threshold: 0.5
+
+----------------------------------------------------------------------
+1. Test Images
+----------------------------------------------------------------------
+[1] imgs/1.jpg
+    Feature Norm: 1.0000
+    Extraction Time: 404.60 ms
+[2] imgs/2.jpg
+    Feature Norm: 1.0000
+    Extraction Time: 449.90 ms
+[3] imgs/3.jpg
+    Feature Norm: 1.0000
+    Extraction Time: 467.49 ms
+[4] imgs/4.jpg
+    Feature Norm: 1.0000
+    Extraction Time: 439.32 ms
+[5] imgs/test.jpg
+    Feature Norm: 1.0000
+    Extraction Time: 95.88 ms
+
+----------------------------------------------------------------------
+2. Similarity Matrix
+----------------------------------------------------------------------
+            1.jpg        2.jpg        3.jpg        4.jpg     test.jpg 
+1.jpg              1.0000       0.3329       0.3085       0.7624       0.0768 
+2.jpg              0.3329       1.0000       0.5840       0.2790       0.1464 
+3.jpg              0.3085       0.5840       1.0000       0.2376       0.0564 
+4.jpg              0.7624       0.2790       0.2376       1.0000      -0.0381 
+test.jpg           0.0768       0.1464       0.0564      -0.0381       1.0000 
+
+----------------------------------------------------------------------
+3. Pairwise Comparison Details
+----------------------------------------------------------------------
+1.jpg vs 2.jpg:
+  Similarity: 0.3329
+  Time:       0.0708 ms
+  Result:     ✗ NO MATCH
+
+1.jpg vs 3.jpg:
+  Similarity: 0.3085
+  Time:       0.0904 ms
+  Result:     ✗ NO MATCH
+
+1.jpg vs 4.jpg:
+  Similarity: 0.7624
+  Time:       0.1328 ms
+  Result:     ✓ MATCH
+
+1.jpg vs test.jpg:
+  Similarity: 0.0768
+  Time:       0.0558 ms
+  Result:     ✗ NO MATCH
+
+2.jpg vs 3.jpg:
+  Similarity: 0.5840
+  Time:       0.1090 ms
+  Result:     ✓ MATCH
+
+2.jpg vs 4.jpg:
+  Similarity: 0.2790
+  Time:       0.0920 ms
+  Result:     ✗ NO MATCH
+
+2.jpg vs test.jpg:
+  Similarity: 0.1464
+  Time:       0.0465 ms
+  Result:     ✗ NO MATCH
+
+3.jpg vs 4.jpg:
+  Similarity: 0.2376
+  Time:       0.0670 ms
+  Result:     ✗ NO MATCH
+
+3.jpg vs test.jpg:
+  Similarity: 0.0564
+  Time:       0.0479 ms
+  Result:     ✗ NO MATCH
+
+4.jpg vs test.jpg:
+  Similarity: -0.0381
+  Time:       0.0603 ms
+  Result:     ✗ NO MATCH
+
+----------------------------------------------------------------------
+4. Statistical Analysis
+----------------------------------------------------------------------
+Total Comparisons: 10
+Similarity Statistics:
+  Mean:   0.2746
+  Median: 0.2583
+  Std:    0.2325
+  Min:    -0.0381
+  Max:    0.7624
+
+Threshold Analysis (threshold=0.5):
+  Matches:     2/10 (20.0%)
+  No Matches:  8/10 (80.0%)
+
+----------------------------------------------------------------------
+5. Performance Metrics
+----------------------------------------------------------------------
+Feature Extraction:
+  Avg Time: 371.44 ms
+  Min Time: 95.88 ms
+  Max Time: 467.49 ms
+
+Similarity Comparison:
+  Avg Time: 0.0772 ms
+  Min Time: 0.0465 ms
+  Max Time: 0.1328 ms
+
+----------------------------------------------------------------------
+6. Conclusions
+----------------------------------------------------------------------
+✗ LOW: Images show low similarity.
+  They may not be the same person, or image quality is poor.
+
+======================================================================
+End of Report
+======================================================================

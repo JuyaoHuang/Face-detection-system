@@ -7,63 +7,6 @@ Usage:
     python test_similarity.py --images imgs/1.jpg imgs/2.jpg imgs/3.jpg
     或
     python test_similarity.py --dir imgs/ --pattern "*.jpg"
-
-test_similarity.py 使用方法
-
-功能
-
-批量测试多张人脸图片之间的相似度，生成相似度矩阵、热力图和详细报告。
-
-基本用法
-
-测试 imgs 目录下的 1.jpg, 2.jpg, 3.jpg：
-cd face_app
-python test_similarity.py
-
-指定其他图片：
-python test_similarity.py --images img1.jpg img2.jpg img3.jpg
-
-指定目录和匹配模式：
-python test_similarity.py --dir imgs/ --pattern "*.jpg"
-
-修改相似度阈值（默认0.5）：
-python test_similarity.py --threshold 0.6
-
-指定输出目录：
-python test_similarity.py --output ./my_test_results
-
-输出结果
-
-运行后在输出目录（默认 similarity_test_output/）生成：
-
-1. similarity_matrix_*.png - 相似度热力图（可视化矩阵）
-2. similarity_report_*.txt - 详细文本报告，包含：
-- 每张图片的特征信息
-- 相似度矩阵（数值表格）
-- 两两对比详情
-- 统计分析（平均值、标准差等）
-- 性能数据（处理时间）
-- 结论（是否为同一人）
-3. annotated_images/ - 带注释的原图（显示特征维度、范数、耗时）
-
-查看结果
-
-1. 打开 热力图 查看整体相似度分布（颜色越绿相似度越高）
-2. 阅读 报告文件 了解详细数据
-3. 查看 annotated_images 确认每张图片是否正确处理
-
-结果判断
-
-- 相似度 ≥ 0.7：非常确定是同一人 ✓
-- 相似度 0.5-0.7：很可能是同一人 ✓
-- 相似度 < 0.5：可能不是同一人或图片质量差 ✗
-
-示例输出：
-1.jpg vs 2.jpg: 0.8523 ✓ MATCH
-1.jpg vs 3.jpg: 0.8167 ✓ MATCH
-2.jpg vs 3.jpg: 0.8901 ✓ MATCH
-
-结论：所有对比都匹配，确认是同一人
 """
 
 import ctypes

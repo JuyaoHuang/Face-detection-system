@@ -146,8 +146,8 @@ int inference_mobilefacenet_model(rknn_app_context_t *app_ctx, image_buffer_t *a
     rknn_input inputs[1];
     memset(inputs, 0, sizeof(inputs));
     inputs[0].index = 0;
-    inputs[0].type = RKNN_TENSOR_FLOAT32;  // 改为 FLOAT32
-    inputs[0].fmt = RKNN_TENSOR_NHWC;
+    inputs[0].type = RKNN_TENSOR_FLOAT32;
+    inputs[0].fmt = RKNN_TENSOR_NHWC;  // RKNN 会自动转换为模型需要的 NCHW
     inputs[0].size = total_pixels * sizeof(float);
     inputs[0].buf = normalized_data;
 
@@ -192,11 +192,25 @@ int inference_mobilefacenet_model(rknn_app_context_t *app_ctx, image_buffer_t *a
     norm = sqrtf(norm);
     printf("[mobilefacenet] DEBUG: Raw feature norm BEFORE normalization = %.4f\n", norm);
 
+    // 打印前20个特征值（归一化前）
+    printf("[mobilefacenet] DEBUG: First 20 features (before norm): ");
+    for (int i = 0; i < 20; i++) {
+        printf("%.4f ", out_result->embedding[i]);
+    }
+    printf("\n");
+
     if (norm > 1e-6f) {
         for (int i = 0; i < 512; i++) {
             out_result->embedding[i] /= norm;
         }
     }
+
+    // 打印前20个特征值（归一化后）
+    printf("[mobilefacenet] DEBUG: First 20 features (after norm): ");
+    for (int i = 0; i < 20; i++) {
+        printf("%.4f ", out_result->embedding[i]);
+    }
+    printf("\n");
 
     // 7. 释放输出
     rknn_outputs_release(app_ctx->rknn_ctx, app_ctx->io_num.n_output, outputs);
