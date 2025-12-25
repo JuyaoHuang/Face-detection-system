@@ -24,6 +24,9 @@ class DoorController:
         # 检查LED设备是否可用
         if self.led_path and self.led_path.exists():
             logging.info(f"[DoorController] LED device found: {self.led_path}")
+            # 初始化时关闭 LED（开发板上电时 LED9 默认会亮）
+            self._set_led(0)
+            logging.info("[DoorController] LED turned off on initialization")
         elif self.led_path:
             logging.warning(f"[DoorController] LED device not found: {self.led_path}")
             self.led_path = None
