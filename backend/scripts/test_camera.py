@@ -62,7 +62,14 @@ def check_video_devices():
         print(f"找到 {len(video_devices)} 个 video 设备：")
         for device in video_devices:
             device_path = str(device)
-            device_index = int(device.name.replace("video", ""))
+
+            # 跳过符号链接和非数字设备（如 video-camera0）
+            device_name = device.name.replace("video", "")
+            if not device_name.isdigit():
+                print(f"  {device_path}: 跳过（符号链接或非标准设备）")
+                continue
+
+            device_index = int(device_name)
 
             # 尝试获取设备信息
             try:

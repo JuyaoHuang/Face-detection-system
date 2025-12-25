@@ -5,3 +5,4 @@
 .vscode/
 face_detection/cmake-build-debug/
 *.cmake-build-debug/
+*.jpg

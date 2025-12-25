@@ -18,6 +18,36 @@
 ## 🛠️ 技术栈
 
 ### 后端
+
+```
+📝 更新摘要
+
+| 配置项                  | 原值           | 新值                  | 说明                         |
+|-------------------------|----------------|-----------------------|------------------------------|
+| CAMERA_INDEX            | 0              | 9                     | USB 摄像头设备索引           |
+| CAMERA_MODE             | "auto"         | "opencv"              | USB 摄像头只支持 OpenCV 模式 |
+| CAMERA_FALLBACK_INDICES | [0, 1, 11, 21] | [9, 10, 0, 1, 11, 21] | 优先尝试 USB 摄像头节点      |
+| DEV_MODE                | True           | False                 | 切换到生产模式，使用真实硬件 |
+
+📋 关键配置详情
+
+backend/config.py 第 37-50 行：
+# 摄像头设备索引
+# - 9: USB 摄像头（晟悦 SY011HD-V1, 1080P@60fps, UVC协议）
+# - 测试结果：/dev/video9, uvcvideo驱动, 30 FPS @ 640x480
+CAMERA_INDEX = 9
+
+# 摄像头初始化模式
+# - USB 摄像头必须使用 'opencv' 模式（不支持 rkisp 硬件加速）
+CAMERA_MODE = "opencv"
+
+backend/config.py 第 149 行：
+# 当前已部署到 RK3568 开发板，使用真实 USB 摄像头
+DEV_MODE = False
+```
+
+
+
 - **FastAPI** - 现代化的 Python Web 框架
 - **OpenCV** - 图像处理与视频流
 - **SQLite** - 轻量级数据库

@@ -36,16 +36,18 @@ DEFAULT_ADMIN_PASSWORD = "123456"
 
 # ==================== 摄像头配置 ====================
 # 摄像头设备索引
-# - 0: 默认摄像头（OV5695 通常是 /dev/video0）
+# - 9: USB 摄像头（晟悦 SY011HD-V1, 1080P@60fps, UVC协议）
+# - 测试结果：/dev/video9, uvcvideo驱动, 30 FPS @ 640x480
 # - 如果有多个摄像头，可以设置为 1, 2, 3...
 # - RK3568 上可能需要尝试不同索引（0, 1, 11, 21）
-CAMERA_INDEX = int(os.getenv("CAMERA_INDEX", "0"))
+CAMERA_INDEX = int(os.getenv("CAMERA_INDEX", "9"))
 
 # 摄像头初始化模式（重要配置）
 # - 'auto': 自动模式（推荐）- 优先尝试 gstreamer，失败则降级到 opencv
-# - 'gstreamer': 强制使用 GStreamer 硬件加速管道（RK3568 专用，性能最佳）
-# - 'opencv': 强制使用标准 OpenCV V4L2（通用模式，兼容性最好）
-CAMERA_MODE = "auto"  # 可选值: 'auto', 'gstreamer', 'opencv'
+# - 'gstreamer': 强制使用 GStreamer 硬件加速管道（RK3568 专用，仅支持 MIPI CSI 摄像头）
+# - 'opencv': 强制使用标准 OpenCV V4L2（通用模式，兼容性最好，支持 USB 摄像头）
+# - USB 摄像头必须使用 'opencv' 模式（不支持 rkisp 硬件加速）
+CAMERA_MODE = "opencv"  # 可选值: 'auto', 'gstreamer', 'opencv'
 
 # GStreamer 管道配置（仅在 gstreamer 模式下使用）
 # - 适用于 RK3568 + OV5695 硬件加速
@@ -58,9 +60,10 @@ GSTREAMER_PIPELINE = (
 )
 
 # OpenCV 模式下尝试的设备索引列表
+# - USB 摄像头：通常占用两个设备节点（video9=图像捕获, video10=元数据）
 # - RK3568 上可能有多个 video 设备（ISP、编码器、实际摄像头）
 # - 按顺序尝试，找到第一个能读取帧的设备
-CAMERA_FALLBACK_INDICES = [0, 1, 11, 21]
+CAMERA_FALLBACK_INDICES = [9, 10, 0, 1, 11, 21]
 
 # 摄像头分辨率配置
 # - 推荐配置：640x480 (VGA) - 性能最佳，门禁场景足够
@@ -142,7 +145,8 @@ DEBUG_MODE = False
 # 开发模式（用于 PC 开发调试，跳过硬件依赖）
 # - True：使用 Mock 模拟摄像头和人脸引擎，不初始化真实硬件
 # - False：正常加载硬件模块（RK3568 生产环境）
-DEV_MODE = True  # PC 开发时设置为 True，部署到 RK3568 时改为 False
+# - 当前已部署到 RK3568 开发板，使用真实 USB 摄像头
+DEV_MODE = False  # PC 开发时设置为 True，部署到 RK3568 时改为 False
 
 # ==================== 日志配置 ====================
 # 日志级别
