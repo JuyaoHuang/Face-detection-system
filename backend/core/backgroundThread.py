@@ -105,22 +105,40 @@ class BackgroundThread(threading.Thread):
 
                 if results is not None:
                     # 识别到人脸，进行特征比对
-                    logging.info("识别到人脸")
+                    logging.info("识别到人脸，开始特征比对")
 
                     # 从数据库中获取所有人脸特征
                     db_results = db_manager.get_face_features()
+                    logging.info(f"数据库中有 {len(db_results)} 个已录入人脸")
 
-                    # 遍历数据库中的每个人脸特征，计算相似度
-                    for item in db_results:
-                        sim = face_engine.compute_similarity(
-                            results, item["feature_vector"]
-                        )
-                        # 若为已知人脸相似度大于阈值，记录日志并且开锁
-                        if sim > self.similarity_threshold:
-                            logging.info(f"识别到 {item['name']}, 相似度: {sim:.4f}")
-                            self.door_lock.open()
-                            logging.info("开锁")
-                            break
+                    # 如果数据库为空
+                    if len(db_results) == 0:
+                        logging.warning("数据库中没有已录入的人脸，无法比对")
+                    else:
+                        # 遍历数据库中的每个人脸特征，计算相似度
+                        max_sim = 0.0
+                        matched_name = None
+
+                        for item in db_results:
+                            sim = face_engine.compute_similarity(
+                                results, item["feature_vector"]
+                            )
+                            logging.info(f"与 {item['name']} 的相似度: {sim:.4f}")
+
+                            # 记录最高相似度
+                            if sim > max_sim:
+                                max_sim = sim
+                                matched_name = item['name']
+
+                            # 若为已知人脸相似度大于阈值，记录日志并且开锁
+                            if sim > self.similarity_threshold:
+                                print(f"✓ 识别成功: {item['name']}, 相似度: {sim:.4f} (阈值: {self.similarity_threshold})")
+                                self.door_lock.open()
+                                logging.info("开锁")
+                                break
+                        else:
+                            # 所有比对都失败
+                            logging.warning(f"✗ 识别失败: 最高相似度 {max_sim:.4f} ({matched_name}), 未达到阈值 {self.similarity_threshold}")
                 else:
                     # 未识别到人脸
                     logging.info("未识别到人脸")

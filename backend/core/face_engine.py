@@ -182,7 +182,16 @@ class FaceEngine:
         Returns:
             float: 余弦相似度 [0, 1]
         """
-        if not feature1 or not feature2:
+        # 修复：正确处理 None 和空数组（兼容 list 和 numpy 数组）
+        if feature1 is None or feature2 is None:
+            return 0.0
+
+        # 检查数组长度
+        try:
+            if len(feature1) == 0 or len(feature2) == 0:
+                return 0.0
+        except TypeError:
+            # 如果无法获取长度，返回 0
             return 0.0
 
         if len(feature1) != 512 or len(feature2) != 512:

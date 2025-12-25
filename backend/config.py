@@ -108,7 +108,7 @@ CONTOUR_THRESHOLD = 500
 # - 0.5：较宽松（误识别风险高）
 # - 0.7：较严格（可能需要多次尝试）
 # - 0.8+：非常严格（可能无法识别）
-SIMILARITY_THRESHOLD = 0.5  # 从原来的 0.5 提高到 0.6，增强安全性
+SIMILARITY_THRESHOLD = 0.3  # 从原来的 0.5 提高到 0.6，增强安全性
 
 # ==================== 门锁控制配置 ====================
 # 开门持续时间（秒）
@@ -124,8 +124,14 @@ GPIO_DOOR_PIN = None  # 实际部署时需要修改为真实引脚号，例如�
 # 蜂鸣器 GPIO 引脚（可选）
 GPIO_BUZZER_PIN = None  # 示例：18
 
-# LED 指示灯 GPIO 引脚（可选）
+# LED 指示灯 GPIO 引脚（可选，仅用于传统GPIO控制）
 GPIO_LED_PIN = None  # 示例：27
+
+# LED 指示灯 sysfs 路径（RK3568 开发板使用）
+# - RK3568 开发板使用 sysfs LED 控制接口
+# - 可用LED：work (/sys/class/leds/work/brightness)
+# - 亮度范围：0-255（0=关闭，255=最亮）
+LED_SYSFS_PATH = "/sys/class/leds/work/brightness"
 
 # ==================== FastAPI 服务器配置 ====================
 # 监听地址

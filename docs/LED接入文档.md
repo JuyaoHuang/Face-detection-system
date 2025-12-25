@@ -55,3 +55,28 @@ work
 ```
 
 **LED 设备ID：LED9:work**
+
+## 步骤
+
+执行
+```bash
+# 1. 先关闭它的自动闪烁（如果有的话）
+echo none | sudo tee /sys/class/leds/work/trigger
+
+# 2. 尝试点亮
+echo 1 | sudo tee /sys/class/leds/work/brightness
+# (此时观察板子，应该有一颗灯亮起)
+
+# 3. 尝试熄灭
+echo 0 | sudo tee /sys/class/leds/work/brightness
+```
+发现正常， LED9 受控制。
+添加权限：
+```bash
+sudo chmod 666 /sys/class/leds/work/brightness
+sudo chmod 666 /sys/class/leds/work/trigger
+```
+
+## 要求
+
+将 LED 接入项目，然后完成自动化配置：板子上电后，自启动后端。
