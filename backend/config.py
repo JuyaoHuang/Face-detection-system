@@ -124,8 +124,14 @@ GPIO_DOOR_PIN = None  # 实际部署时需要修改为真实引脚号，例如�
 # 蜂鸣器 GPIO 引脚（可选）
 GPIO_BUZZER_PIN = None  # 示例：18
 
-# LED 指示灯 GPIO 引脚（可选）
+# LED 指示灯 GPIO 引脚（可选，仅用于传统GPIO控制）
 GPIO_LED_PIN = None  # 示例：27
+
+# LED 指示灯 sysfs 路径（RK3568 开发板使用）
+# - RK3568 开发板使用 sysfs LED 控制接口
+# - 可用LED：work (/sys/class/leds/work/brightness)
+# - 亮度范围：0-255（0=关闭，255=最亮）
+LED_SYSFS_PATH = "/sys/class/leds/work/brightness"
 
 # ==================== FastAPI 服务器配置 ====================
 # 监听地址

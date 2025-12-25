@@ -2,12 +2,13 @@ import logging
 import threading
 import time
 from typing import Optional
+from pathlib import Path
 
-from backend.config import DOOR_OPEN_DURATION
+from backend.config import DOOR_OPEN_DURATION, LED_SYSFS_PATH
 
 
 class DoorController:
-    """门控制器类"""
+    """门控制器类（使用LED指示灯代替实际门锁）"""
 
     def __init__(self, status: bool = False):
         """初始化门控制器"""
@@ -18,28 +19,64 @@ class DoorController:
 
         self.status = status  # 当前门状态：False-关闭，True-打开
         self._door_lock = threading.Lock()  # 实例级别的线程锁，用于控制开门操作
+        self.led_path = Path(LED_SYSFS_PATH) if LED_SYSFS_PATH else None
+
+        # 检查LED设备是否可用
+        if self.led_path and self.led_path.exists():
+            logging.info(f"[DoorController] LED device found: {self.led_path}")
+        elif self.led_path:
+            logging.warning(f"[DoorController] LED device not found: {self.led_path}")
+            self.led_path = None
+        else:
+            logging.info("[DoorController] LED control disabled (LED_SYSFS_PATH not configured)")
+
+    def _set_led(self, brightness: int):
+        """
+        控制LED亮度
+
+        Args:
+            brightness: 亮度值 (0-255)，0为关闭，255为最亮
+        """
+        if not self.led_path:
+            logging.debug("[DoorController] LED not configured, simulating LED control")
+            return
+
+        try:
+            # 限制亮度范围
+            brightness = max(0, min(255, brightness))
+
+            # 写入亮度值到sysfs
+            with open(self.led_path, 'w') as f:
+                f.write(str(brightness))
+
+            logging.info(f"[DoorController] LED brightness set to {brightness}")
+        except PermissionError:
+            logging.error(f"[DoorController] Permission denied: {self.led_path}. Run with sudo or configure udev rules.")
+        except Exception as e:
+            logging.error(f"[DoorController] Failed to control LED: {e}")
 
     def open(self):
-        """开门操作（非阻塞）
+        """开门操作（非阻塞）- 使用LED亮起代替实际门锁开启
 
         如果门已经在开门过程中，则直接返回，不执行重复操作
         """
         # 尝试获取锁，如果已被锁定则直接返回
         if not self._door_lock.acquire(blocking=False):
-            logging.info("Door is busy")
+            logging.info("[DoorController] Door is busy")
             return
 
         try:
-            logging.info("Open the door")
-            # TODO: 调用 GPIO 控制开门的实际硬件操作
+            logging.info("[DoorController] Open the door (LED ON)")
+            # 点亮LED（代替实际门锁开启）
+            self._set_led(255)
             self.status = True
 
-            # 保持门打开指定时间（从配置文件读取）
+            # 保持LED亮起指定时间（从配置文件读取）
             time.sleep(DOOR_OPEN_DURATION)
 
-            # 执行关锁操作
-            logging.info("Close the door")
-            # TODO: 调用 GPIO 控制关锁的实际硬件操作
+            # 关闭LED（代替实际门锁关闭）
+            logging.info("[DoorController] Close the door (LED OFF)")
+            self._set_led(0)
             self.status = False
 
         finally:
