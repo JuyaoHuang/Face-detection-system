@@ -19,7 +19,8 @@ import cv2
 from pathlib import Path
 from datetime import datetime
 import matplotlib
-matplotlib.use('Agg')  # 使用非交互式后端
+
+matplotlib.use("Agg")  # 使用非交互式后端
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -36,7 +37,7 @@ def print_header(text):
     """打印标题"""
     print(f"\n{'=' * 70}")
     print(f"  {text}")
-    print('=' * 70)
+    print("=" * 70)
 
 
 def extract_all_features(engine, image_paths):
@@ -60,7 +61,7 @@ def extract_all_features(engine, image_paths):
 
         feature, timing = engine.extract_feature(
             image_path,
-            save_output=False  # 暂不保存单张结果
+            save_output=False,  # 暂不保存单张结果
         )
 
         if feature is not None:
@@ -125,8 +126,10 @@ def compute_similarity_matrix(engine, results):
 
                 comparison_times.append(comp_time)
 
-                print(f"  {Path(image_paths[i]).name} vs {Path(image_paths[j]).name}: "
-                      f"{similarity:.4f} ({comp_time:.4f} ms)")
+                print(
+                    f"  {Path(image_paths[i]).name} vs {Path(image_paths[j]).name}: "
+                    f"{similarity:.4f} ({comp_time:.4f} ms)"
+                )
 
     # 提取图片名称
     image_names = [Path(p).name for p in image_paths]
@@ -157,21 +160,24 @@ def visualize_similarity_matrix(similarity_matrix, image_names, output_dir):
     sns.heatmap(
         similarity_matrix,
         annot=True,  # 显示数值
-        fmt='.4f',  # 格式化为4位小数
-        cmap='RdYlGn',  # 红-黄-绿配色（低-中-高）
+        fmt=".4f",  # 格式化为4位小数
+        cmap="RdYlGn",  # 红-黄-绿配色（低-中-高）
         xticklabels=image_names,
         yticklabels=image_names,
         vmin=0,
         vmax=1,
-        cbar_kws={'label': 'Cosine Similarity'}
+        cbar_kws={"label": "Cosine Similarity"},
     )
-    plt.title('Face Similarity Matrix', fontsize=16, fontweight='bold')
-    plt.xlabel('Image', fontsize=12)
-    plt.ylabel('Image', fontsize=12)
+    plt.title("Face Similarity Matrix", fontsize=16, fontweight="bold")
+    plt.xlabel("Image", fontsize=12)
+    plt.ylabel("Image", fontsize=12)
     plt.tight_layout()
 
     # 保存热力图
-    heatmap_path = Path(output_dir) / f"similarity_matrix_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    heatmap_path = (
+        Path(output_dir)
+        / f"similarity_matrix_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    )
     plt.savefig(heatmap_path, dpi=150)
     plt.close()
 
@@ -180,7 +186,9 @@ def visualize_similarity_matrix(similarity_matrix, image_names, output_dir):
     return heatmap_path
 
 
-def generate_report(similarity_matrix, image_names, results, comparison_times, output_dir, threshold=0.5):
+def generate_report(
+    similarity_matrix, image_names, results, comparison_times, output_dir, threshold=0.5
+):
     """
     生成详细的测试报告
 
@@ -195,10 +203,10 @@ def generate_report(similarity_matrix, image_names, results, comparison_times, o
     print_header("步骤 4: 生成测试报告")
 
     # 创建报告文件
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     report_path = Path(output_dir) / f"similarity_report_{timestamp}.txt"
 
-    with open(report_path, 'w', encoding='utf-8') as f:
+    with open(report_path, "w", encoding="utf-8") as f:
         # 标题
         f.write("=" * 70 + "\n")
         f.write("           Face Similarity Test Report\n")
@@ -215,7 +223,7 @@ def generate_report(similarity_matrix, image_names, results, comparison_times, o
         for i, (path, (feature, timing)) in enumerate(valid_results.items(), 1):
             f.write(f"[{i}] {path}\n")
             f.write(f"    Feature Norm: {np.linalg.norm(feature):.4f}\n")
-            f.write(f"    Extraction Time: {sum(timing.values())*1000:.2f} ms\n")
+            f.write(f"    Extraction Time: {sum(timing.values()) * 1000:.2f} ms\n")
         f.write("\n")
 
         # 2. 相似度矩阵
@@ -277,8 +285,12 @@ def generate_report(similarity_matrix, image_names, results, comparison_times, o
         # 基于阈值的判断
         matches = sum(1 for s in similarities if s >= threshold)
         f.write(f"Threshold Analysis (threshold={threshold}):\n")
-        f.write(f"  Matches:     {matches}/{len(similarities)} ({matches/len(similarities)*100:.1f}%)\n")
-        f.write(f"  No Matches:  {len(similarities)-matches}/{len(similarities)} ({(len(similarities)-matches)/len(similarities)*100:.1f}%)\n")
+        f.write(
+            f"  Matches:     {matches}/{len(similarities)} ({matches / len(similarities) * 100:.1f}%)\n"
+        )
+        f.write(
+            f"  No Matches:  {len(similarities) - matches}/{len(similarities)} ({(len(similarities) - matches) / len(similarities) * 100:.1f}%)\n"
+        )
         f.write("\n")
 
         # 5. 性能数据
@@ -286,7 +298,7 @@ def generate_report(similarity_matrix, image_names, results, comparison_times, o
         f.write("5. Performance Metrics\n")
         f.write("-" * 70 + "\n")
 
-        extraction_times = [sum(v[1].values())*1000 for v in valid_results.values()]
+        extraction_times = [sum(v[1].values()) * 1000 for v in valid_results.values()]
         f.write(f"Feature Extraction:\n")
         f.write(f"  Avg Time: {np.mean(extraction_times):.2f} ms\n")
         f.write(f"  Min Time: {np.min(extraction_times):.2f} ms\n")
@@ -317,7 +329,9 @@ def generate_report(similarity_matrix, image_names, results, comparison_times, o
                 f.write("  May need manual review or better quality images.\n")
             else:
                 f.write("✗ LOW: Images show low similarity.\n")
-                f.write("  They may not be the same person, or image quality is poor.\n")
+                f.write(
+                    "  They may not be the same person, or image quality is poor.\n"
+                )
         f.write("\n")
 
         f.write("=" * 70 + "\n")
@@ -370,21 +384,35 @@ def save_annotated_images(results, output_dir):
         font = cv2.FONT_HERSHEY_SIMPLEX
         y_offset = 35
 
-        cv2.putText(img, Path(image_path).name, (20, y_offset),
-                    font, 0.7, (255, 255, 255), 2)
+        cv2.putText(
+            img, Path(image_path).name, (20, y_offset), font, 0.7, (255, 255, 255), 2
+        )
         y_offset += 30
 
-        cv2.putText(img, f"Feature Dim: 512", (20, y_offset),
-                    font, 0.5, (0, 255, 0), 1)
+        cv2.putText(img, f"Feature Dim: 512", (20, y_offset), font, 0.5, (0, 255, 0), 1)
         y_offset += 25
 
-        cv2.putText(img, f"Norm: {np.linalg.norm(feature):.4f}", (20, y_offset),
-                    font, 0.5, (0, 255, 0), 1)
+        cv2.putText(
+            img,
+            f"Norm: {np.linalg.norm(feature):.4f}",
+            (20, y_offset),
+            font,
+            0.5,
+            (0, 255, 0),
+            1,
+        )
         y_offset += 25
 
         total_time = sum(timing.values())
-        cv2.putText(img, f"Time: {total_time*1000:.2f} ms", (20, y_offset),
-                    font, 0.5, (0, 255, 255), 1)
+        cv2.putText(
+            img,
+            f"Time: {total_time * 1000:.2f} ms",
+            (20, y_offset),
+            font,
+            0.5,
+            (0, 255, 255),
+            1,
+        )
 
         # 保存
         output_path = annotated_dir / Path(image_path).name
@@ -395,47 +423,37 @@ def save_annotated_images(results, output_dir):
 def main():
     parser = argparse.ArgumentParser(description="Batch Face Similarity Test Script")
     parser.add_argument(
-        "--images",
-        type=str,
-        nargs='+',
-        default=None,
-        help="List of image paths"
+        "--images", type=str, nargs="+", default=None, help="List of image paths"
     )
     parser.add_argument(
         "--dir",
         type=str,
         default="imgs",
-        help="Directory containing images (default: imgs)"
+        help="Directory containing images (default: imgs)",
     )
     parser.add_argument(
         "--pattern",
         type=str,
         default="[1-3].jpg",
-        help="Filename pattern (default: [1-3].jpg)"
+        help="Filename pattern (default: [1-3].jpg)",
     )
     parser.add_argument(
         "--threshold",
         type=float,
         default=0.5,
-        help="Similarity threshold (default: 0.5)"
+        help="Similarity threshold (default: 0.5)",
     )
     parser.add_argument(
-        "--output",
-        type=str,
-        default=OUTPUT_DIR,
-        help="Output directory"
+        "--output", type=str, default=OUTPUT_DIR, help="Output directory"
     )
     parser.add_argument(
-        "--retinaface",
-        type=str,
-        default=RETINAFACE_MODEL,
-        help="RetinaFace model path"
+        "--retinaface", type=str, default=RETINAFACE_MODEL, help="RetinaFace model path"
     )
     parser.add_argument(
         "--mobilefacenet",
         type=str,
         default=MOBILEFACENET_MODEL,
-        help="MobileFaceNet model path"
+        help="MobileFaceNet model path",
     )
 
     args = parser.parse_args()
@@ -456,6 +474,7 @@ def main():
             return
 
         import glob
+
         pattern_path = str(image_dir / args.pattern)
         image_paths = glob.glob(pattern_path)
 
@@ -491,14 +510,18 @@ def main():
     results = extract_all_features(engine, image_paths)
 
     # 步骤 2: 计算相似度矩阵
-    similarity_matrix, image_names, comparison_times = compute_similarity_matrix(engine, results)
+    similarity_matrix, image_names, comparison_times = compute_similarity_matrix(
+        engine, results
+    )
 
     if similarity_matrix is None:
         print("\n✗ Test failed: Not enough valid images")
         return
 
     # 步骤 3: 可视化相似度矩阵
-    heatmap_path = visualize_similarity_matrix(similarity_matrix, image_names, args.output)
+    heatmap_path = visualize_similarity_matrix(
+        similarity_matrix, image_names, args.output
+    )
 
     # 步骤 4: 生成详细报告
     report_path = generate_report(
@@ -507,7 +530,7 @@ def main():
         results,
         comparison_times,
         args.output,
-        args.threshold
+        args.threshold,
     )
 
     # 步骤 5: 保存带注释的图片

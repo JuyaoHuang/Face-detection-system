@@ -132,13 +132,13 @@ class FaceEngine:
         t_start = time.time()
         with open(image_path, "rb") as f:
             jpeg_data = f.read()
-        timing_stats['load_image'] = time.time() - t_start
+        timing_stats["load_image"] = time.time() - t_start
 
         # 2. 转换为 ctypes 数组
         t_start = time.time()
         jpeg_array = np.frombuffer(jpeg_data, dtype=np.uint8)
         jpeg_ptr = jpeg_array.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte))
-        timing_stats['prepare_data'] = time.time() - t_start
+        timing_stats["prepare_data"] = time.time() - t_start
 
         # 3. 准备输出缓冲区
         feature_512 = np.zeros(512, dtype=np.float32)
@@ -150,7 +150,7 @@ class FaceEngine:
         ret = lib.FaceEngine_ExtractFeature(
             self.engine, jpeg_ptr, len(jpeg_data), feature_ptr
         )
-        timing_stats['feature_extraction'] = time.time() - t_start
+        timing_stats["feature_extraction"] = time.time() - t_start
 
         if ret == 0:
             print("✓ Feature extracted successfully")
@@ -163,18 +163,26 @@ class FaceEngine:
             # 保存中间结果图片
             if save_output:
                 t_start = time.time()
-                self._save_result_image(image_path, feature_512, timing_stats, output_dir)
-                timing_stats['save_image'] = time.time() - t_start
+                self._save_result_image(
+                    image_path, feature_512, timing_stats, output_dir
+                )
+                timing_stats["save_image"] = time.time() - t_start
 
             # 打印时间统计
             print(f"\n⏱️  Time Statistics:")
-            print(f"  Load image:          {timing_stats['load_image']*1000:.2f} ms")
-            print(f"  Prepare data:        {timing_stats['prepare_data']*1000:.2f} ms")
-            print(f"  Feature extraction:  {timing_stats['feature_extraction']*1000:.2f} ms")
+            print(f"  Load image:          {timing_stats['load_image'] * 1000:.2f} ms")
+            print(
+                f"  Prepare data:        {timing_stats['prepare_data'] * 1000:.2f} ms"
+            )
+            print(
+                f"  Feature extraction:  {timing_stats['feature_extraction'] * 1000:.2f} ms"
+            )
             if save_output:
-                print(f"  Save result image:   {timing_stats['save_image']*1000:.2f} ms")
+                print(
+                    f"  Save result image:   {timing_stats['save_image'] * 1000:.2f} ms"
+                )
             total_time = sum(timing_stats.values())
-            print(f"  Total:               {total_time*1000:.2f} ms")
+            print(f"  Total:               {total_time * 1000:.2f} ms")
 
             return feature_512, timing_stats
         elif ret == -1:
@@ -218,27 +226,62 @@ class FaceEngine:
         line_height = 25
 
         # 标题
-        cv2.putText(img, "Face Feature Extraction Result", (20, y_offset),
-                    font, 0.7, (255, 255, 255), thickness)
+        cv2.putText(
+            img,
+            "Face Feature Extraction Result",
+            (20, y_offset),
+            font,
+            0.7,
+            (255, 255, 255),
+            thickness,
+        )
         y_offset += line_height + 5
 
         # 特征信息
-        cv2.putText(img, f"Feature Dim: 512", (20, y_offset),
-                    font, font_scale, color, thickness - 1)
+        cv2.putText(
+            img,
+            f"Feature Dim: 512",
+            (20, y_offset),
+            font,
+            font_scale,
+            color,
+            thickness - 1,
+        )
         y_offset += line_height
 
-        cv2.putText(img, f"Feature Norm: {np.linalg.norm(feature):.4f}", (20, y_offset),
-                    font, font_scale, color, thickness - 1)
+        cv2.putText(
+            img,
+            f"Feature Norm: {np.linalg.norm(feature):.4f}",
+            (20, y_offset),
+            font,
+            font_scale,
+            color,
+            thickness - 1,
+        )
         y_offset += line_height
 
         # 时间信息
         total_time = sum(timing_stats.values())
-        cv2.putText(img, f"Total Time: {total_time*1000:.2f} ms", (20, y_offset),
-                    font, font_scale, (0, 255, 255), thickness - 1)
+        cv2.putText(
+            img,
+            f"Total Time: {total_time * 1000:.2f} ms",
+            (20, y_offset),
+            font,
+            font_scale,
+            (0, 255, 255),
+            thickness - 1,
+        )
         y_offset += line_height
 
-        cv2.putText(img, f"Extraction: {timing_stats['feature_extraction']*1000:.2f} ms",
-                    (20, y_offset), font, font_scale, (0, 255, 255), thickness - 1)
+        cv2.putText(
+            img,
+            f"Extraction: {timing_stats['feature_extraction'] * 1000:.2f} ms",
+            (20, y_offset),
+            font,
+            font_scale,
+            (0, 255, 255),
+            thickness - 1,
+        )
 
         # 生成输出文件名
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -343,7 +386,9 @@ def main():
 
     # 如果提供了第二张图片，进行比对
     if args.image2:
-        feature2, timing2 = engine.extract_feature(args.image2, save_output, args.output)
+        feature2, timing2 = engine.extract_feature(
+            args.image2, save_output, args.output
+        )
         if feature2 is not None:
             similarity, compare_time = engine.compare_faces(feature1, feature2)
 
@@ -367,7 +412,9 @@ def main():
                 print(f"  Image 1 total time: {total_time1:.2f} ms")
                 print(f"  Image 2 total time: {total_time2:.2f} ms")
                 print(f"  Comparison time:    {compare_time:.4f} ms")
-                print(f"  Grand total:        {total_time1 + total_time2 + compare_time:.2f} ms")
+                print(
+                    f"  Grand total:        {total_time1 + total_time2 + compare_time:.2f} ms"
+                )
     else:
         # 只提取特征，打印前10个值作为示例
         print("\nFeature vector (first 10 values):")

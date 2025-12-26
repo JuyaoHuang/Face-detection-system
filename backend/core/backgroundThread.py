@@ -128,17 +128,21 @@ class BackgroundThread(threading.Thread):
                             # 记录最高相似度
                             if sim > max_sim:
                                 max_sim = sim
-                                matched_name = item['name']
+                                matched_name = item["name"]
 
                             # 若为已知人脸相似度大于阈值，记录日志并且开锁
                             if sim > self.similarity_threshold:
-                                print(f"✓ 识别成功: {item['name']}, 相似度: {sim:.4f} (阈值: {self.similarity_threshold})")
+                                print(
+                                    f"✓ 识别成功: {item['name']}, 相似度: {sim:.4f} (阈值: {self.similarity_threshold})"
+                                )
                                 self.door_lock.open()
                                 logging.info("开锁")
                                 break
                         else:
                             # 所有比对都失败
-                            logging.warning(f"✗ 识别失败: 最高相似度 {max_sim:.4f} ({matched_name}), 未达到阈值 {self.similarity_threshold}")
+                            logging.warning(
+                                f"✗ 识别失败: 最高相似度 {max_sim:.4f} ({matched_name}), 未达到阈值 {self.similarity_threshold}"
+                            )
                 else:
                     # 未识别到人脸
                     logging.info("未识别到人脸")

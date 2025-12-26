@@ -54,7 +54,9 @@ async def stream(request: Request):
 
                 # 4. 构建 HTTP multipart/x-mixed-replace 响应
                 yield (
-                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
+                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                    + frame_bytes
+                    + b"\r\n"
                 )
 
                 # 短暂休眠，避免占用过多 CPU（控制帧率）

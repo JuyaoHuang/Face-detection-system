@@ -6,6 +6,7 @@
 import numpy as np
 from test_api import FaceEngine, RETINAFACE_MODEL, MOBILEFACENET_MODEL
 
+
 def analyze_features():
     print("=" * 70)
     print("特征向量诊断工具")
@@ -15,10 +16,7 @@ def analyze_features():
     engine = FaceEngine(RETINAFACE_MODEL, MOBILEFACENET_MODEL)
 
     # 测试图片
-    images = [
-        "imgs/1.jpg",
-        "imgs/test.jpg"
-    ]
+    images = ["imgs/1.jpg", "imgs/test.jpg"]
 
     features = {}
 
@@ -102,6 +100,7 @@ def analyze_features():
             print("⚠️  警告: 不同人的相似度过高，可能存在问题")
         else:
             print("✓ 正常: 不同人的相似度在合理范围内")
+
 
 if __name__ == "__main__":
     analyze_features()

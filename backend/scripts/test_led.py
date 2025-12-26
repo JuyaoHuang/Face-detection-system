@@ -15,6 +15,7 @@ sys.path.insert(0, str(project_root))
 from backend.core.doorController import get_door_controller
 import time
 
+
 def main():
     print("=" * 60)
     print("LED 控制测试")
@@ -87,6 +88,7 @@ def main():
     print("  - 如果看到 'Permission denied'，请使用 sudo 运行此脚本")
     print("  - 如果LED未配置，将只显示日志模拟输出")
     print("  - 观察开发板上的 'work' LED 是否按预期亮起/熄灭")
+
 
 if __name__ == "__main__":
     main()

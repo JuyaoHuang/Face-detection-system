@@ -31,7 +31,9 @@ class DoorController:
             logging.warning(f"[DoorController] LED device not found: {self.led_path}")
             self.led_path = None
         else:
-            logging.info("[DoorController] LED control disabled (LED_SYSFS_PATH not configured)")
+            logging.info(
+                "[DoorController] LED control disabled (LED_SYSFS_PATH not configured)"
+            )
 
     def _set_led(self, brightness: int):
         """
@@ -49,12 +51,14 @@ class DoorController:
             brightness = max(0, min(255, brightness))
 
             # 写入亮度值到sysfs
-            with open(self.led_path, 'w') as f:
+            with open(self.led_path, "w") as f:
                 f.write(str(brightness))
 
             logging.info(f"[DoorController] LED brightness set to {brightness}")
         except PermissionError:
-            logging.error(f"[DoorController] Permission denied: {self.led_path}. Run with sudo or configure udev rules.")
+            logging.error(
+                f"[DoorController] Permission denied: {self.led_path}. Run with sudo or configure udev rules."
+            )
         except Exception as e:
             logging.error(f"[DoorController] Failed to control LED: {e}")
 
